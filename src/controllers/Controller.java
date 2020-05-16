@@ -14,7 +14,7 @@ import java.util.Random;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
-
+    //
     public ChoiceBox<Integer> length;
     public ChoiceBox<Integer> count;
     public CheckBox rus;
