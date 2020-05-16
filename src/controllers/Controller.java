@@ -1,28 +1,29 @@
 package controllers;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import model.PasswordGenerator;
+
+import model.*;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
-
-    public ChoiceBox length;
-    public ChoiceBox count;
+    //
+    public ChoiceBox<Integer> length;
+    public ChoiceBox<Integer> count;
     public CheckBox rus;
     public CheckBox rusUpper;
     public CheckBox eng;
     public CheckBox engUpper;
     public CheckBox nums;
     public CheckBox symbols;
-    public ListView list;
+    public ListView<String> list;
     public TextField passwordToCode;
     public TextField codedPassword;
     public TextField codeToPassword;
@@ -37,43 +38,42 @@ public class Controller implements Initializable {
         count.setValue(1);
     }
 
-    public void generate(ActionEvent actionEvent) {
+    public void generate() {
         if (rus.isSelected() || rusUpper.isSelected() || eng.isSelected() || engUpper.isSelected() || nums.isSelected() || symbols.isSelected()) {
             list.getItems().clear();
+            ArrayList<Filter> filters = new ArrayList<>();
             int i = 1;
-            while (i <= (int) count.getValue()) {
-                PasswordGenerator passwordGenerator = new PasswordGenerator((int) length.getValue(), random);
+            while (i <= count.getValue()) {
                 if (rus.isSelected())
-                    passwordGenerator.filterAddRus();
+                    filters.add(new FilterRus());
                 if (rusUpper.isSelected())
-                    passwordGenerator.filterAddRusUpper();
+                    filters.add(new FilterRusUpper());
                 if (eng.isSelected())
-                    passwordGenerator.filterAddEng();
+                    filters.add(new FilterEng());
                 if (engUpper.isSelected())
-                    passwordGenerator.filterAddEngUpper();
+                    filters.add(new FilterEngUpper());
                 if (nums.isSelected())
-                    passwordGenerator.filterAddNums();
+                    filters.add(new FilterNums());
                 if (symbols.isSelected())
-                    passwordGenerator.filterAddSymbols();
-                list.getItems().add(passwordGenerator.toString() + "");
+                    filters.add(new FilterSymbols());
+                PasswordGenerator passwordGenerator = new PasswordGenerator(length.getValue(), filters);
+                list.getItems().add(passwordGenerator.createPassword());
                 i++;
             }
         }
     }
 
-    public void code(ActionEvent actionEvent) {
+    public void code() {
         if (passwordToCode.getText().length() > 0) {
-            PasswordGenerator passwordGenerator = new PasswordGenerator(passwordToCode.getText());
-            passwordGenerator.filterCode();
-            codedPassword.setText(passwordGenerator.toString());
+            PasswordGenerator passwordGenerator = new PasswordGenerator(passwordToCode.getText(), new FilterCode());
+            codedPassword.setText(passwordGenerator.createPassword());
         }
     }
 
-    public void decode(ActionEvent actionEvent) {
+    public void decode() {
         if (codeToPassword.getText().length() > 0) {
-            PasswordGenerator passwordGenerator = new PasswordGenerator(codeToPassword.getText());
-            passwordGenerator.filterDecode();
-            casualPassword.setText(passwordGenerator.toString());
+            PasswordGenerator passwordGenerator = new PasswordGenerator(codeToPassword.getText(), new FilterDecode());
+            casualPassword.setText(passwordGenerator.createPassword());
         }
     }
 }
